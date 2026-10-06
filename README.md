@@ -38,7 +38,8 @@ The result is printed as JSON:
 ## Play on with your own code
 
 After every game, `autoplay.py` calls `on_result()` in [`player.py`](player.py). By default it
-prints the result and stops.
+prints the result and adds one random key press to the plan, so the plan grows by one move per
+game. It stops when the player dies, the level is won, or the games run out.
 
 This is the place for your own code. For example, send the result to an AI such as Jev, ask it
 for a better plan, and return that plan. `autoplay.py` then plays it and calls `on_result()`
@@ -60,6 +61,9 @@ The plan can be text (`"-1:250,1:45"`) or a list (`[[-1, 250], [1, 45]]`).
 | `--timeout SECONDS` | Give up after this long. Default: 900. The game plays in real time. |
 | `--max-calls N` | Play at most this many games. Default: 10. |
 | `--insecure` | Accept any HTTPS certificate, for a game you run on your own computer. |
+
+When it is done, the script prints a link to replay the last game. Open it in your browser to
+watch the same moves being played.
 
 The script exits with 0 when it gets a result, whatever the status, and with 1 on a timeout or if the page does not load.
 Nothing is saved, in the game or on disk.

@@ -1,11 +1,12 @@
 """Your code goes here.
 
 autoplay.py calls on_result() after every game, with the result the game gave.
-By default it prints the result and stops.
+Return a new plan to play it next, or None to stop. It stops by itself when the
+level is won, or after --max-calls games.
 
-To play on until the level is solved, return a new plan from on_result().
-autoplay.py then plays it, and calls on_result() again with the new result.
-It stops when the level is won, when you return None, or after --max-calls games.
+By default this adds one random key press to the plan that was just played, so
+the plan grows by one move per game. It stops when the player dies, the level is
+won, or the games run out.
 
 Example: ask an AI (such as Jev) what to try next, using the result as its input:
 
@@ -16,6 +17,7 @@ Example: ask an AI (such as Jev) what to try next, using the result as its input
         return ask_jev(result["state"])  # your function; returns e.g. "-1:250,1:45"
 """
 import json
+import random
 
 
 def on_result(result, attempt):
@@ -28,4 +30,11 @@ def on_result(result, attempt):
     or None to stop.
     """
     print(json.dumps(result, indent=2))
-    return None
+    if result.get("status") == "died":
+        return None
+    return result["plan"] + "," + random_key_press()
+
+
+def random_key_press():
+    """One move as direction:ticks: push left (-1), right (1) or not at all (0) for a while."""
+    return f"{random.choice([-1, 0, 1])}:{random.randint(10, 300)}"

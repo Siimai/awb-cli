@@ -76,18 +76,22 @@ def play(browser, url, timeout_s, ignore_cert_errors):
 
 def play_until_done(args, plan):
     """Play the plan, then every plan that on_result() returns, until the level is won,
-    on_result() returns None or --max-calls games have been played."""
+    on_result() returns None or --max-calls games have been played.
+    Then print the URL of the last game, which the player can open to replay it."""
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=find_browser(), args=BROWSER_ARGS)
         try:
             for attempt in range(1, args.max_calls + 1):
-                result = play(browser, game_url(args.url, args.room, plan), args.timeout, args.insecure)
+                url = game_url(args.url, args.room, plan)
+                result = play(browser, url, args.timeout, args.insecure)
                 next_plan = on_result(result, attempt)
                 if result.get("status") == "win" or not next_plan:
                     break
                 plan = next_plan if isinstance(next_plan, str) else json.dumps(next_plan)
         finally:
             browser.close()
+    # On stderr, so that standard output stays the results only.
+    print(f"\nReplay the last game in your browser:\n{url}", file=sys.stderr)
 
 
 def parse_args():
