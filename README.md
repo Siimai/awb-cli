@@ -5,8 +5,10 @@ Give it a level and a list of moves. It plays them in the game and prints what h
 
 ## Install
 
-You need Python 3.
+You need Python 3 on Linux or macOS. Windows is not supported.
 
+    python3 -m venv .venv
+    source .venv/bin/activate
     pip install -r requirements.txt
     playwright install chromium
 
@@ -58,7 +60,7 @@ The plan can be text (`"-1:250,1:45"`) or a list (`[[-1, 250], [1, 45]]`).
 | Option | Meaning |
 | --- | --- |
 | `--url URL` | Where the game is. Default: `https://www.annoyingwhiteball.com/play` (or `$AWB_URL`). |
-| `--timeout SECONDS` | Give up after this long. Default: 900. The game plays in real time. |
+| `--timeout SECONDS` | Give up after this long in total, all games together. Default: 900. The game plays in real time. |
 | `--max-calls N` | Play at most this many games. Default: 10. |
 | `--json` | Print the full result of every game as JSON, not just a summary line. |
 | `--insecure` | Accept any HTTPS certificate, for a game you run on your own computer. |
@@ -66,5 +68,15 @@ The plan can be text (`"-1:250,1:45"`) or a list (`[[-1, 250], [1, 45]]`).
 When it is done, the script prints a link to replay the last game. Open it in your browser to
 watch the same moves being played.
 
-The script exits with 0 when it gets a result, whatever the status, and with 1 on a timeout or if the page does not load.
+The script exits with:
+
+- 0 when it gets a result, whatever the status
+- 1 on a timeout or if the page does not load
+- 2 if the plan is empty
+- 130 when you stop it with Ctrl+C
+
 Nothing is saved, in the game or on disk.
+
+## License
+
+[MIT](LICENSE)
