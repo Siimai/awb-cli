@@ -61,8 +61,11 @@ def read_plan(arg):
     """The plan is given as text, as the name of a file, or as "-" for standard input."""
     if arg == "-":
         return sys.stdin.read().strip()
-    if Path(arg).is_file():
-        return Path(arg).read_text().strip()
+    try:
+        if Path(arg).is_file():
+            return Path(arg).read_text().strip()
+    except OSError:
+        pass  # too long to be a file name, so it is the plan itself
     return arg
 
 
