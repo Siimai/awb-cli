@@ -22,7 +22,7 @@ from playwright.sync_api import sync_playwright
 
 from player import on_result
 
-DEFAULT_URL = "https://www.annoyingwhiteball.com"
+DEFAULT_URL = "https://www.annoyingwhiteball.com/play"
 DEFAULT_TIMEOUT = 900  # seconds; the game is played in real time
 DEFAULT_MAX_CALLS = 10
 

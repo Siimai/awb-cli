@@ -57,7 +57,7 @@ The plan can be text (`"-1:250,1:45"`) or a list (`[[-1, 250], [1, 45]]`).
 
 | Option | Meaning |
 | --- | --- |
-| `--url URL` | Where the game is. Default: `https://www.annoyingwhiteball.com` (or `$AWB_URL`). |
+| `--url URL` | Where the game is. Default: `https://www.annoyingwhiteball.com/play` (or `$AWB_URL`). |
 | `--timeout SECONDS` | Give up after this long. Default: 900. The game plays in real time. |
 | `--max-calls N` | Play at most this many games. Default: 10. |
 | `--insecure` | Accept any HTTPS certificate, for a game you run on your own computer. |
