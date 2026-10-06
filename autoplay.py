@@ -4,14 +4,17 @@
     python3 autoplay.py room43 -1:250,1:45,0:230
 
 The game is opened in a headless browser with the room and plan in its URL.
-The script waits for the autoplay to finish and gives the result to
-on_result() in player.py, which prints it by default. Put your own code there
+The script waits for the autoplay to finish, prints a summary line (or the
+whole result as JSON with --json) and gives the result to on_result() in
+player.py. Put your own code there
 to play on with a new plan, until the level is won or --max-calls is reached.
 """
 import argparse
 import json
 import os
 import re
+import signal
+import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import urlencode
@@ -29,6 +32,7 @@ DEFAULT_MAX_CALLS = 10
 EXIT_OK = 0
 EXIT_FAILED = 1  # timeout, or the page could not be loaded
 EXIT_USAGE = 2
+EXIT_INTERRUPTED = 130  # Ctrl+C, as shells report it
 
 BROWSER_ARGS = [
     "--no-sandbox",
@@ -74,6 +78,15 @@ def play(browser, url, timeout_s, ignore_cert_errors):
     return page.evaluate("window.awbAutoplayResult")
 
 
+def quit_on_interrupt(signum, frame):
+    """Quit at once on Ctrl+C. Playwright's driver gets the signal too and starts shutting down
+    on its own, which leaves this script waiting on it. So kill the driver (our child; the
+    browser exits when the driver is gone) and exit, without Playwright's own cleanup."""
+    subprocess.run(["pkill", "-KILL", "-P", str(os.getpid())], capture_output=True)
+    print("\nInterrupted", file=sys.stderr, flush=True)
+    os._exit(EXIT_INTERRUPTED)
+
+
 def play_until_done(args, plan):
     """Play the plan, then every plan that on_result() returns, until the level is won,
     on_result() returns None or --max-calls games have been played.
@@ -84,6 +97,11 @@ def play_until_done(args, plan):
             for attempt in range(1, args.max_calls + 1):
                 url = game_url(args.url, args.room, plan)
                 result = play(browser, url, args.timeout, args.insecure)
+                if args.json:
+                    print(json.dumps(result, indent=2))
+                else:
+                    print(f"Game {attempt}: {result.get('status')} "
+                          f"({result.get('room')}, {result.get('frames')} frames)")
                 next_plan = on_result(result, attempt)
                 if result.get("status") == "win" or not next_plan:
                     break
@@ -96,7 +114,7 @@ def play_until_done(args, plan):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Play Annoying White Ball and print the result as JSON (see player.py).")
+        description="Play Annoying White Ball and print the result (see player.py).")
     # Plans start with a direction such as -1:250: treat those as values, not options.
     parser._negative_number_matcher = re.compile(r"^-\d")
     parser.add_argument("room", help="room name (room43) or level number (44)")
@@ -108,6 +126,8 @@ def parse_args():
                         help=f"give up after this long (default: {DEFAULT_TIMEOUT})")
     parser.add_argument("--max-calls", type=int, default=DEFAULT_MAX_CALLS, metavar="N",
                         help=f"play at most this many games (default: {DEFAULT_MAX_CALLS})")
+    parser.add_argument("--json", action="store_true",
+                        help="print the full result of every game as JSON")
     parser.add_argument("--insecure", action="store_true",
                         help="accept any HTTPS certificate (for a game served locally)")
     return parser.parse_args()
@@ -115,6 +135,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    signal.signal(signal.SIGINT, quit_on_interrupt)
     plan = read_plan(args.plan)
     if not plan:
         print("error: the plan is empty", file=sys.stderr)

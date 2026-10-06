@@ -1,7 +1,7 @@
 # awb-cli
 
 Play [Annoying White Ball](https://www.annoyingwhiteball.com) from the command line.
-Give it a level and a list of moves. It plays them in the game and prints what happened as JSON.
+Give it a level and a list of moves. It plays them in the game and prints what happened.
 
 ## Install
 
@@ -22,7 +22,7 @@ For example, play level 1 (`room0`):
 - **MOVES** is a list of `direction:ticks` pairs. Direction is `-1` (left), `1` (right) or `0` (no push).
   You can also give a file with the moves, or `-` to read them from standard input.
 
-The result is printed as JSON:
+Add `--json` to print the full result of each game as JSON:
 
     {
       "status": "win",
@@ -38,7 +38,7 @@ The result is printed as JSON:
 ## Play on with your own code
 
 After every game, `autoplay.py` calls `on_result()` in [`player.py`](player.py). By default it
-prints the result and adds one random key press to the plan, so the plan grows by one move per
+adds one random key press to the plan, so the plan grows by one move per
 game. It stops when the player dies, the level is won, or the games run out.
 
 This is the place for your own code. For example, send the result to an AI such as Jev, ask it
@@ -60,6 +60,7 @@ The plan can be text (`"-1:250,1:45"`) or a list (`[[-1, 250], [1, 45]]`).
 | `--url URL` | Where the game is. Default: `https://www.annoyingwhiteball.com/play` (or `$AWB_URL`). |
 | `--timeout SECONDS` | Give up after this long. Default: 900. The game plays in real time. |
 | `--max-calls N` | Play at most this many games. Default: 10. |
+| `--json` | Print the full result of every game as JSON, not just a summary line. |
 | `--insecure` | Accept any HTTPS certificate, for a game you run on your own computer. |
 
 When it is done, the script prints a link to replay the last game. Open it in your browser to

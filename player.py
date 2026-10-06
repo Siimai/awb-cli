@@ -16,7 +16,6 @@ Example: ask an AI (such as Jev) what to try next, using the result as its input
             return None
         return ask_jev(result["state"])  # your function; returns e.g. "-1:250,1:45"
 """
-import json
 import random
 
 
@@ -29,7 +28,6 @@ def on_result(result, attempt):
     Return the next plan, as text ("-1:250,1:45") or as a list ([[-1, 250], [1, 45]]),
     or None to stop.
     """
-    print(json.dumps(result, indent=2))
     if result.get("status") == "died":
         return None
     return result["plan"] + "," + random_key_press()
