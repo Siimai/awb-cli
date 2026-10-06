@@ -7,8 +7,6 @@ Give it a level and a list of moves. It plays them in the game and prints what h
 
 You need Python 3 on Linux or macOS. Windows is not supported.
 
-    python3 -m venv .venv
-    source .venv/bin/activate
     pip install -r requirements.txt
     playwright install chromium
 
